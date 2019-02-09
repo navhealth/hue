@@ -64,7 +64,7 @@ def download(handle, format, db, id=None, file_name='query_result', user_agent=N
   return resp
 
 
-def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
+def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1, source=None):
   """
   upload(query_model, path, user, db, fs) -> None
 
@@ -75,7 +75,7 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True, max_bytes=max_bytes, source=source)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
@@ -83,7 +83,7 @@ def upload(path, handle, user, db, fs, max_rows=-1, max_bytes=-1):
 
 class HS2DataAdapter:
 
-  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None):
+  def __init__(self, handle, db, max_rows=-1, start_over=True, max_bytes=-1, callback=None, source=None):
     self.handle = handle
     self.db = db
     self.max_rows = max_rows
@@ -93,6 +93,7 @@ class HS2DataAdapter:
     self.limit_rows = max_rows > -1
     self.limit_bytes = max_bytes > -1
     self.callback = callback
+    self.source = source
 
     self.first_fetched = True
     self.headers = None
@@ -134,7 +135,10 @@ class HS2DataAdapter:
     return size
 
   def next(self):
-    results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
+    if self.source=='rdbms':
+      results = self.db.execute_statement(self.handle)
+    else:
+      results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
 
     if self.first_fetched:
       self.first_fetched = False
@@ -152,7 +156,11 @@ class HS2DataAdapter:
         self.fetch_size = 100
 
     if self.has_more and not self.is_truncated:
-      self.has_more = results.has_more
+      if self.source == 'rdbms':
+        self.has_more = False
+      else:
+        self.has_more = results.has_more
+
       data = []
 
       for row in results.rows():

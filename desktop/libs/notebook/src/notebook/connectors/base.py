@@ -347,7 +347,7 @@ def get_api(request, snippet):
     return TextApi(request.user)
   elif interface == 'rdbms':
     from notebook.connectors.rdbms import RdbmsApi
-    return RdbmsApi(request.user, interpreter=snippet['type'], query_server=snippet.get('query_server'))
+    return RdbmsApi(request.user, request=request, interpreter=snippet['type'], query_server=snippet.get('query_server'))
   elif interface == 'altus-adb':
     from notebook.connectors.altus_adb import AltusAdbApi
     return AltusAdbApi(user=request.user, cluster_name=cluster_name, request=request)

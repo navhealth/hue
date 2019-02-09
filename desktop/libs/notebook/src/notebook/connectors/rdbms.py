@@ -24,10 +24,13 @@ from beeswax import data_export
 from librdbms.server import dbms
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name
-
+from desktop.lib.exceptions_renderable import PopupException
+import urllib
 
 LOG = logging.getLogger(__name__)
 
+DOWNLOAD_ROW_LIMIT = 1000000
+DOWNLOAD_BYTES_LIMIT = 1000000000
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
@@ -207,6 +210,66 @@ class RdbmsApi(Api):
       return self.query_server
     else:
       return dbms.get_query_server_config(server=self.interpreter)
+
+
+  @query_error_handler
+  def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
+    db = dbms.get(self.user, query_server=self._get_query_server())
+
+    max_rows = DOWNLOAD_ROW_LIMIT
+    max_bytes = DOWNLOAD_BYTES_LIMIT
+
+    data_export.upload(target_file, snippet['statement'], self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes, source='rdbms')
+
+    return '/filebrowser/view=%s' % urllib.quote(urllib.quote(target_file.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')) # Quote twice, because of issue in the routing on client
+
+
+  # def _get_handle(self, snippet):
+  #   try:
+  #     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
+  #   except KeyError:
+  #     raise Exception('Operation has no valid handle attached')
+  #   except binascii.Error:
+  #     LOG.warn('Handle already base 64 decoded')
+  #
+  #   for key in snippet['result']['handle'].keys():
+  #     if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
+  #       snippet['result']['handle'].pop(key)
+  #
+  #   return HiveServerQueryHandle(**snippet['result']['handle'])
+  #
+  # def export_large_data_to_hdfs(self, notebook, snippet, destination):
+  #   db = dbms.get(self.user, query_server=self._get_query_server())
+  #
+  #   response = self._get_current_statement(db, snippet)
+  #   session = self._get_session(notebook, snippet['type'])
+  #   query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+  #
+  #   if 'select' not in query.hql_query.strip().lower():
+  #     raise PopupException(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+  #
+  #   hql = '''
+  #     DROP TABLE IF EXISTS `%(table)s`;
+  #
+  #     CREATE TABLE `%(table)s` ROW FORMAT DELIMITED
+  #          FIELDS TERMINATED BY '\\t'
+  #          ESCAPED BY '\\\\'
+  #          LINES TERMINATED BY '\\n'
+  #          STORED AS TEXTFILE LOCATION '%(location)s'
+  #          AS
+  #     %(hql)s;
+  #
+  #     ALTER TABLE `%(table)s` SET TBLPROPERTIES('EXTERNAL'='TRUE');
+  #
+  #     DROP TABLE IF EXISTS `%(table)s`;
+  #   ''' % {
+  #     'table': _get_snippet_name(notebook, unique=True, table_format=True),
+  #     'location': self.request.fs.netnormpath(destination),
+  #     'hql': query.hql_query
+  #   }
+  #   success_url = '/filebrowser/view=%s' % urllib.quote(destination.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
+  #
+  #   return hql, success_url
 
 
 class Assist():

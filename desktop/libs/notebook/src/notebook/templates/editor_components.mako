@@ -195,7 +195,7 @@ ${ sqlSyntaxDropdown.sqlSyntaxDropdown() }
                   <!-- /ko -->
                 </span>
               % else:
-                <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
+                <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), text: editorTypeTitle(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
               <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
 
               <!-- ko switch: editorType() -->

@@ -58,6 +58,8 @@ def coerce_database(database):
     return 'django.db.backends.oracle'
   elif database in ('sqlite', 'sqlite3'):
     return 'django.db.backends.sqlite3'
+  elif database == 'presto':
+    return 'django.db.backends.presto'
   else:
     return str(database)
 
