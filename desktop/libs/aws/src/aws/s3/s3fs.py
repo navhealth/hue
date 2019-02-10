@@ -265,8 +265,16 @@ class S3FileSystem(object):
 
     if s3.is_root(path):
       try:
-        return sorted([S3Stat.from_bucket(b) for b in self._s3_connection.get_all_buckets()], key=lambda x: x.name)
+        accessible_buckets = []
+        for bucket in self._s3_connection.get_all_buckets():
+          try:
+            self._s3_connection.head_bucket(bucket.name)
+            accessible_buckets.append(bucket)
+          except:
+            pass
+        return sorted([S3Stat.from_bucket(b) for b in accessible_buckets], key=lambda x: x.name, reverse=True)
       except S3FileSystemException, e:
+        print 'error path:', path
         raise e
       except S3ResponseError, e:
         raise S3FileSystemException(_('Failed to retrieve buckets: %s') % e.reason)
@@ -279,11 +287,19 @@ class S3FileSystem(object):
     res = []
     for item in bucket.list(prefix=prefix, delimiter='/'):
       if isinstance(item, Prefix):
-        res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True))
+        try:
+          #bucket.get_key(item.name)
+          res.append(S3Stat.from_key(Key(item.bucket, item.name), is_dir=True))
+        except:
+          pass
       else:
         if item.name == prefix:
           continue
-        res.append(self._stats_key(item))
+        try:
+          #bucket.get_key(item.name)
+          res.append(self._stats_key(item))
+        except:
+          pass
     return res
 
   @translate_s3_error
