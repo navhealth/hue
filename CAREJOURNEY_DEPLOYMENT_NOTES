@@ -1,0 +1,128 @@
+
+------------------------------------------------------------------------------
+To start Hue as a daemon under the "hue" user:
+
+sudo runuser -l hue -c '/usr/local/hue/build/env/bin/supervisor -d'
+
+------------------------------------------------------------------------------
+
+Repository notes:
+
+* this repository was forked from the Hue GitHub repo:
+https://github.com/cloudera/hue
+
+* the "cj-deploy-1.0" branch was branched from the "release-4.3.0" branch which
+was the most recent public release at the time of the fork
+
+* this repo was forked for two primary reasons:
+1) to provide operational isolation and eliminate development snafus
+2) there were a number of minor customizations required to adapt Hue to the
+CareJourney use case
+
+------------------------------------------------------------------------------
+
+Change notes:
+
+2019-02-11: Initial deployment
+
+- apps/beeswax/src/beeswax/data_export.py --> tweak the results exporter to
+support the "RDBMS" connector type
+
+- desktop/core/src/desktop/conf.py --> add entry for new "presto" RDBMS lib
+
+libs/librdbms/src/librdbms/server/dbms.py --> add entry for new "presto" RDBMS lib
+
+libs/librdbms/src/librdbms/server/presto_lib.py --> add new RDBMS lib for "presto"
+using postgresql lib as template and borrowing enhancements from the presto driver
+in the CareJourney data platform
+
+libs/notebook/src/notebook/connectors/base.py --> add "request" param to "RdbmsApi"
+instantiation
+
+libs/notebook/src/notebook/connectors/jdbc.py --> edit the "get_tables_full" and
+"get_columns_full" to return blanks for table_comment and column_comment since
+the presto catalog does not have those columns
+
+libs/notebook/src/notebook/connectors/rdbms.py --> added "export_data_as_hdfs_file"
+function, borrowed from "hiveserver2.py" connector.
+
+libs/notebook/src/notebook/templates/editor_components.mako --> added sql interpreter
+name to header of sql editor so user knows which connection they are using
+
+CAREJOURNEY_DEPLOYMENT_NOTES --> this file
+
+requirements.txt --> added requirements.txt to assist with local development setup.
+however, many of the python libs uses are quite old and not available in pip.
+but don't fret, all the dependencies are in the \desktop\ext-py directory
+
+------------------------------------------------------------------------------
+
+Developer notes:
+
+* Hue is primarily a Django-based python application with a custom-plugin
+framework for sub-components managed by a framework called the "supervisor"
+
+* UI templating in Hue uses mako templates and custom javascript
+
+* there is a small java component for jdbc database connections for which the
+app uses the py4j library.  otherwise, everything is in the python2 ecosystem.
+
+* The top-level application is the "Desktop".  Think of the "desktop" like a
+portal in which app plugins are rendered.  Desktop code is located at /desktop.
+
+* There are many "app" modules corresponding to different components in the
+Hadoop ecosystem.  We won't be using most of them.  For our purposes, the following
+are of interest:
+- beeswax --> metadata manager that is responsible for Hue's metadata repository
+- filebrowser --> interface to S3 (and HDFS)
+- rdbms --> SQL query environment
+- useradmin --> Hue security
+
+* application "build" uses make. yeah, make.  mostly this is to deal with the
+local compilation of the python resource wheels.
+
+
+------------------------------------------------------------------------------
+
+Installation process:
+
+1) get source code and unpack into an appropriate "source code" directory":
+there are three possible ways to get the source code for compile-deploy:
+- download from dropbox location referenced on GetHue blog post for release 4.3.0:
+http://gethue.com/hue-4-3-and-its-app-building-improvements-are-out/
+
+- download from GitHub release assets:
+https://github.com/cloudera/hue/releases/tag/release-4.3.0
+
+- clone either Hue's main repo or CareJourney's forked repo onto deployment server
+
+2) create a local user (does not require logon) called "hue"
+
+3) ensure python 2.7.14+ and pip is installed locally
+
+4) install prerequisites per:  http://cloudera.github.io/hue/latest/admin-manual/manual.html
+for an EC2 instance running AmazonLinux2:
+sudo yum install ant asciidoc cyrus-sasl-devel cyrus-sasl-gssapi cyrus-sasl-plain gcc gcc-c++ krb5-devel libffi-devel libxml2-devel libxslt-devel make  mysql mysql-devel openldap-devel python-devel sqlite-devel gmp-devel
+
+5) "build" the application.  from the "source code" directory (you should see
+the Makefile) run the following.
+PREFIX=/usr/local make install
+cd /usr/local/hue
+
+NOTE: "PREFIX" is the target directory into which Hue will be installed.
+IMPORTANT:  do not include "hue" in the directory path, the build process will
+make the "hue" directory.  for the example above, "PREFIX=/usr/local"
+"builds" and "installs" the hue app into the "/usr/local/hue" directory
+
+6) if installation is not from the carejourney fork of the hue repo, then you
+will need to copy updated python/mako/... files to the correct locations
+
+7) update the hue.ini configuration file to set appropriate parameters for
+the deployment.  see "carejourney-hue.ini" file in this directory for current
+configuration.
+
+IMPORTANT:  you will need to update the sample config file to set appropriate
+values for the target environment
+
+
+
