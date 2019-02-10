@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 
 
 class BaseRDBMSDataTable(object):
-  def __init__(self, cursor, columns, fetch_size=1000):
+  def __init__(self, cursor, columns, fetch_size=1000, fetch_max=None):
     self.cursor = cursor
     if columns and isinstance(columns[0], dict): # Backward compatible for API without column metadata
       self.columns_description = columns
@@ -34,7 +34,13 @@ class BaseRDBMSDataTable(object):
       self.columns = columns
     self.next = None
     self.startRowOffset = 0
-    self.fetchSize = 1000
+    self.fetchSize = fetch_size
+    # if no max provided limit to 1000 to limit server resource usage
+    # if -1 provided, then limit to 1 million to prevent server crash
+    self.fetch_max = fetch_max if fetch_max else 1000
+    self.fetch_max = 1000000 if fetch_max == -1 else self.fetch_max
+    self.fetched_cnt = 0
+
 
   @property
   def ready(self):
@@ -44,15 +50,17 @@ class BaseRDBMSDataTable(object):
   def has_more(self):
     if not self.next:
       self.next = list(self.cursor.fetchmany(self.fetchSize))
+      self.fetched_cnt += len(self.next)
+    if self.fetched_cnt > self.fetch_max:
+      self.next = []
     return bool(self.next)
 
   def cols(self):
     return self.columns
 
   def rows(self):
-    while self.has_more:
+    while self.has_more and self.fetched_cnt <= self.fetch_max:
       yield self.next.pop(0)
-
 
 
 class BaseRDBMSResult(object):

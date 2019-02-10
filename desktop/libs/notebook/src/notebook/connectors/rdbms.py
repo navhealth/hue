@@ -20,7 +20,7 @@ import sys
 
 from desktop.lib.i18n import force_unicode
 
-from beeswax import data_export
+from beeswax import data_export, conf
 from librdbms.server import dbms
 
 from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name
@@ -29,8 +29,6 @@ import urllib
 
 LOG = logging.getLogger(__name__)
 
-DOWNLOAD_ROW_LIMIT = 1000000
-DOWNLOAD_BYTES_LIMIT = 1000000000
 
 def query_error_handler(func):
   def decorator(*args, **kwargs):
@@ -216,27 +214,27 @@ class RdbmsApi(Api):
   def export_data_as_hdfs_file(self, snippet, target_file, overwrite):
     db = dbms.get(self.user, query_server=self._get_query_server())
 
-    max_rows = DOWNLOAD_ROW_LIMIT
-    max_bytes = DOWNLOAD_BYTES_LIMIT
+    max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
+    max_bytes = -1
 
     data_export.upload(target_file, snippet['statement'], self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes, source='rdbms')
 
     return '/filebrowser/view=%s' % urllib.quote(urllib.quote(target_file.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')) # Quote twice, because of issue in the routing on client
 
+  @query_error_handler
+  def export_large_data_to_hdfs(self, notebook, snippet, destination):
+    raise PopupException(('NOT IMPLEMENTED:  please use the "First Rows" option'), detail=None)
 
-  # def _get_handle(self, snippet):
-  #   try:
-  #     snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
-  #   except KeyError:
-  #     raise Exception('Operation has no valid handle attached')
-  #   except binascii.Error:
-  #     LOG.warn('Handle already base 64 decoded')
-  #
-  #   for key in snippet['result']['handle'].keys():
-  #     if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
-  #       snippet['result']['handle'].pop(key)
-  #
-  #   return HiveServerQueryHandle(**snippet['result']['handle'])
+  @query_error_handler
+  def export_data_as_table(self, notebook, snippet, destination, is_temporary=False, location=None):
+    raise PopupException(('NOT IMPLEMENTED:  please use the "First Rows" option'), detail=None)
+
+#    db = dbms.get(self.user, query_server=self._get_query_server())
+#    max_rows = -1
+#    max_bytes = -1
+#    data_export.upload(destination, snippet['statement'], self.request.user, db, self.request.fs, max_rows=max_rows, max_bytes=max_bytes, source='rdbms')
+#    return snippet['statement'], '/filebrowser/view=%s' % urllib.quote(urllib.quote(destination.encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')) # Quote twice, because of issue in the routing on client
+
   #
   # def export_large_data_to_hdfs(self, notebook, snippet, destination):
   #   db = dbms.get(self.user, query_server=self._get_query_server())

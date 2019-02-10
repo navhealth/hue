@@ -271,33 +271,35 @@ except ImportError, e:
                 </label>
               </div>
             </div>
-            <div class="control-group">
-              <div class="controls">
-                <label class="radio">
-                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('All') }
-                </label>
-                <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
-                </div>
-                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save the complete result as TSV") }', placement: 'top' }" style="padding: 8px">
-                  <i class="fa fa-fw fa-question-circle muted"></i>
-                </div>
-              </div>
-            </div>
-            ${ _('Dashboard') }
-            <br>
-            <div class="control-group">
-              <div class="controls">
-                <label class="radio">
-                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
-                  &nbsp;${ _('Table') }
-                </label>
-                <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
-                  <input data-bind="hivechooser: savePath, valueUpdate:'afterkeydown', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
-                </div>
-              </div>
-            </div>
+
+## DISABLED BECAUSE WE ARE NOT USING DASHBOARD AND NOT USING HADOOP/HIVE FOR QUERY
+##            <div class="control-group">
+##              <div class="controls">
+##                <label class="radio">
+##                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
+##                  &nbsp;${ _('All') }
+##                </label>
+##                <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
+##                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
+##                </div>
+##                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save the complete result as TSV") }', placement: 'top' }" style="padding: 8px">
+##                  <i class="fa fa-fw fa-question-circle muted"></i>
+##                </div>
+##              </div>
+##            </div>
+##            ${ _('Dashboard') }
+##            <br>
+##            <div class="control-group">
+##              <div class="controls">
+##                <label class="radio">
+##                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
+##                  &nbsp;${ _('Table') }
+##                </label>
+##                <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
+##                  <input data-bind="hivechooser: savePath, valueUpdate:'afterkeydown', skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
+##                </div>
+##              </div>
+##            </div>
             % if ENABLE_SQL_INDEXER.get():
             <div class="control-group">
               <div class="controls">

@@ -114,7 +114,8 @@ def get_connector_name(name):
     'sqlite3': 'sqlite',
     'postgresql_psycopg2': 'postgresql',
     'postgresql': 'postgresql',
-    'mysql': 'mysql'
+    'mysql': 'mysql',
+    'presto': 'presto'
   }.get(engine, name)
 
 

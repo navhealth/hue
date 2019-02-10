@@ -105,8 +105,8 @@ class Rdbms(object):
   def get_sample_data(self, database, table_name, column=None, limit=100):
     return self.client.get_sample_data(database, table_name, column, limit)
 
-  def execute_statement(self, statement):
-    return self.client.execute_statement(statement)
+  def execute_statement(self, statement, fetch_max=None):
+    return self.client.execute_statement(statement, fetch_max)
 
   def execute_query(self, query, design):
     from beeswax.models import QueryHistory

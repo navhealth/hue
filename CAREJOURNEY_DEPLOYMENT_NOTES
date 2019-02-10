@@ -30,28 +30,30 @@ support the "RDBMS" connector type
 
 - desktop/core/src/desktop/conf.py --> add entry for new "presto" RDBMS lib
 
-libs/librdbms/src/librdbms/server/dbms.py --> add entry for new "presto" RDBMS lib
+- desktop/libs/librdbms/src/librdbms/server/dbms.py --> add entry for new "presto" RDBMS lib
 
-libs/librdbms/src/librdbms/server/presto_lib.py --> add new RDBMS lib for "presto"
+- desktop/libs/librdbms/src/librdbms/server/presto_lib.py --> add new RDBMS lib for "presto"
 using postgresql lib as template and borrowing enhancements from the presto driver
 in the CareJourney data platform
 
-libs/notebook/src/notebook/connectors/base.py --> add "request" param to "RdbmsApi"
+- desktop/libs/librdbms/src/librdbms/conf.py --> add connector name entry for presto
+
+- libs/notebook/src/notebook/connectors/base.py --> add "request" param to "RdbmsApi"
 instantiation
 
-libs/notebook/src/notebook/connectors/jdbc.py --> edit the "get_tables_full" and
+- libs/notebook/src/notebook/connectors/jdbc.py --> edit the "get_tables_full" and
 "get_columns_full" to return blanks for table_comment and column_comment since
 the presto catalog does not have those columns
 
-libs/notebook/src/notebook/connectors/rdbms.py --> added "export_data_as_hdfs_file"
+- libs/notebook/src/notebook/connectors/rdbms.py --> added "export_data_as_hdfs_file"
 function, borrowed from "hiveserver2.py" connector.
 
-libs/notebook/src/notebook/templates/editor_components.mako --> added sql interpreter
+- libs/notebook/src/notebook/templates/editor_components.mako --> added sql interpreter
 name to header of sql editor so user knows which connection they are using
 
-CAREJOURNEY_DEPLOYMENT_NOTES --> this file
+- CAREJOURNEY_DEPLOYMENT_NOTES --> this file
 
-requirements.txt --> added requirements.txt to assist with local development setup.
+- requirements.txt --> added requirements.txt to assist with local development setup.
 however, many of the python libs uses are quite old and not available in pip.
 but don't fret, all the dependencies are in the \desktop\ext-py directory
 

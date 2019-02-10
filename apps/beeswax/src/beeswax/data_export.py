@@ -19,6 +19,7 @@ import json
 import logging
 import math
 import types
+import datetime
 
 from django.utils.translation import ugettext as _
 
@@ -29,7 +30,7 @@ from beeswax import common, conf
 LOG = logging.getLogger(__name__)
 
 
-FETCH_SIZE = 1000
+FETCH_SIZE = 10000
 DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
 
@@ -104,7 +105,7 @@ class HS2DataAdapter:
     self.has_more = True
     self._results = None
     if self.source == 'rdbms':
-      self._results = self.db.execute_statement(self.handle)
+      self._results = self.db.execute_statement(self.handle, fetch_max=max_rows)
 
   def __iter__(self):
     return self
@@ -155,13 +156,13 @@ class HS2DataAdapter:
 
       # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
       if self.num_cols > 100:
-        LOG.warn('The query results contain %d columns and may take long time to download, reducing fetch size to 100.' % self.num_cols)
-        self.fetch_size = 100
+         self.fetch_size = 100
 
     if self.has_more and not self.is_truncated:
       self.has_more = results.has_more
       data = []
 
+      rdbms_fetch_cnt = 0
       for row in results.rows():
         self.row_counter += 1
         if self.limit_bytes:
@@ -176,6 +177,11 @@ class HS2DataAdapter:
           self.is_truncated = True
           break
         data.append(row)
+
+        # add break for rdbms sources to prevent fetch all
+        rdbms_fetch_cnt += 1
+        if self.source == 'rdbms' and rdbms_fetch_cnt >= self.fetch_size:
+          break
 
       return self.headers, data
     else:

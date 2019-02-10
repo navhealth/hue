@@ -98,7 +98,7 @@ class PrestoClient(BaseRDMSClient):
     pass
 
 
-  def execute_statement(self, statement):
+  def execute_statement(self, statement, fetch_max=None):
     cursor = self.connection.cursor()
     cursor.execute(statement)
 
@@ -106,7 +106,7 @@ class PrestoClient(BaseRDMSClient):
       columns = [column[0] for column in cursor.description]
     else:
       columns = []
-    return self.data_table_cls(cursor, columns)
+    return self.data_table_cls(cursor, columns, fetch_max=fetch_max)
 
 
   def get_databases(self):
@@ -242,6 +242,18 @@ class CursorWrapper(Cursor):
         if not self._can_retry_query(err, error_map, operation):
           raise
         # else loop with while again
+
+  def fetchmany(self, size=None):
+    rows = []
+    rownum = 0
+    while rownum < size:
+      rownum += 1
+      row = self.fetchone()
+      if row:
+        rows.append(row)
+      else:
+        break
+    return rows
 
   def fetchone(self):
     """
