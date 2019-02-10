@@ -102,6 +102,9 @@ class HS2DataAdapter:
     self.bytes_counter = 0
     self.is_truncated = False
     self.has_more = True
+    self._results = None
+    if self.source == 'rdbms':
+      self._results = self.db.execute_statement(self.handle)
 
   def __iter__(self):
     return self
@@ -136,7 +139,7 @@ class HS2DataAdapter:
 
   def next(self):
     if self.source=='rdbms':
-      results = self.db.execute_statement(self.handle)
+      results = self._results
     else:
       results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
 
@@ -156,11 +159,7 @@ class HS2DataAdapter:
         self.fetch_size = 100
 
     if self.has_more and not self.is_truncated:
-      if self.source == 'rdbms':
-        self.has_more = False
-      else:
-        self.has_more = results.has_more
-
+      self.has_more = results.has_more
       data = []
 
       for row in results.rows():
