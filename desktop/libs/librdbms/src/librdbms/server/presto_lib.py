@@ -32,6 +32,17 @@ _RETRY_MAP = {
   'AmazonS3Exception': {'tot': 60, 'delay': 5}
 }
 
+_DATA_TYPE_MAP = {
+  'varchar': 'VARCHAR_TYPE',
+  'decimal': 'DECIMAL_TYPE',
+  'smallint': 'SMALLINT_TYPE',
+  'bigint': 'BIGINT_TYPE',
+  'int': 'INT_TYPE',
+  'integer': 'INT_TYPE',
+  'timestamp': 'TIMESTAMP_TYPE',
+  'date': 'DATE_TYPE'
+}
+
 
 class DataTable(BaseRDBMSDataTable): pass
 
@@ -103,10 +114,15 @@ class PrestoClient(BaseRDMSClient):
     cursor.execute(statement)
 
     if cursor.description:
-      columns = [column[0] for column in cursor.description]
+      columns = [{'name': column[0], 'type': self._convert_types(column[1])}
+                 for column in cursor.description]
     else:
       columns = []
     return self.data_table_cls(cursor, columns, fetch_max=fetch_max)
+
+  def _convert_types(self, cursor_type):
+
+    return _DATA_TYPE_MAP.get(cursor_type.split('(').pop(0), cursor_type)
 
 
   def get_databases(self):
