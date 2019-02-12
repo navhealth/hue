@@ -60,6 +60,8 @@ def coerce_database(database):
     return 'django.db.backends.sqlite3'
   elif database == 'presto':
     return 'django.db.backends.presto'
+  elif database == 'hive':
+    return 'django.db.backends.hive'
   else:
     return str(database)
 

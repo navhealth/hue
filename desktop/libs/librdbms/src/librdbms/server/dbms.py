@@ -29,6 +29,7 @@ POSTGRESQL = 'postgresql'
 SQLITE = 'sqlite'
 ORACLE = 'oracle'
 PRESTO = 'presto'
+HIVE = 'hive'
 
 def get(user, query_server=None):
   if query_server is None:
@@ -55,6 +56,11 @@ def get(user, query_server=None):
     from librdbms.server.presto_lib import PrestoClient
 
     return Rdbms(PrestoClient(query_server, user), PRESTO)
+
+  elif query_server['server_name'] == 'hive':
+    from librdbms.server.hive_lib import HiveClient
+
+    return Rdbms(HiveClient(query_server, user), HIVE)
 
 
 def get_query_server_config(server=None):

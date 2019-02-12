@@ -115,7 +115,8 @@ def get_connector_name(name):
     'postgresql_psycopg2': 'postgresql',
     'postgresql': 'postgresql',
     'mysql': 'mysql',
-    'presto': 'presto'
+    'presto': 'presto',
+    'hive': 'hive'
   }.get(engine, name)
 
 
