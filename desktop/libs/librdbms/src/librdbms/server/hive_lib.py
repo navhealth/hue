@@ -101,7 +101,7 @@ class HiveClient(BaseRDMSClient):
     cursor = self.connection.cursor()
     query = """
       SHOW tables
-      IN '%s'
+      IN %s
     """ % database
 
     cursor.execute(query)
@@ -296,7 +296,6 @@ class CursorWrapper(object):
           self._rownumber += 1
       else:
           row = None
-          self._rownumber = 0
 
       return row
 
