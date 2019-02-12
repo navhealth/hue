@@ -75,6 +75,8 @@ class HiveClient(BaseRDMSClient):
 
   def execute_statement(self, statement, fetch_max=None):
     cursor = self.connection.cursor()
+    statement = "--USER: {user} \n{sql}".format(user=str(self.user) + '@HUE',
+                                                sql=statement)
     cursor.execute(statement)
 
     if cursor.description:

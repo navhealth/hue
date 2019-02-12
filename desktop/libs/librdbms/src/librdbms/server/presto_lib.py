@@ -68,6 +68,7 @@ class PrestoClient(BaseRDMSClient):
       username=params['username'],
       schema=params["schema"],
       protocol=params['protocol'],
+      source=str(self.user) + '@HUE',
       requests_kwargs={
         'auth': HTTPBasicAuth(
           params['username'],
@@ -77,7 +78,6 @@ class PrestoClient(BaseRDMSClient):
       }
     )
     self.connection = ConnectionWrapper(conn)
-
 
   @property
   def _conn_params(self):
@@ -111,6 +111,8 @@ class PrestoClient(BaseRDMSClient):
 
   def execute_statement(self, statement, fetch_max=None):
     cursor = self.connection.cursor()
+    statement = "--USER: {user} \n{sql}".format(user=str(self.user) + '@HUE',
+                                                sql=statement)
     cursor.execute(statement)
 
     if cursor.description:
