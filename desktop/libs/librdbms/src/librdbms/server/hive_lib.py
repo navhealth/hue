@@ -293,7 +293,7 @@ class CursorWrapper(object):
 
       :return:
       """
-      if self._rownumber < len(self._results):
+      if self._results and self._rownumber < len(self._results):
           row = self._results[self._rownumber]
           self._rownumber += 1
       else:
