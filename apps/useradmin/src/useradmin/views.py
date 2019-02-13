@@ -924,8 +924,11 @@ def _get_find_groups_filter(ldap_info, server=None):
   sanitized_dn = ldap.filter.escape_filter_chars(ldap_info['dn']).replace(r'\2a', r'*')
   sanitized_dn = sanitized_dn.replace(r'\5c,', r'\5c\2c')
 
-  find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
-                       group_member_attr + "=" + sanitized_dn + ")))"
+  #find_groups_filter = "(&" + group_filter + "(|(" + group_member_attr + "=" + ldap_info['username'] + ")(" + \
+  #                     group_member_attr + "=" + sanitized_dn + ")))"
+
+  # use magic recursive search filter pattern
+  find_groups_filter = "(member:1.2.840.113556.1.4.1941:=" + sanitized_dn + ")"
 
   return find_groups_filter
 
