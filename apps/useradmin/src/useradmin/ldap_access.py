@@ -416,7 +416,11 @@ class LdapConnection(object):
     dn = dn.replace(r'\5c,', r'\2c')
 
     search_dn, _ = self._get_search_params(dn, search_attr)
-    ldap_filter = '(&%(ldap_filter)s(|(isMemberOf=%(group_dn)s)(memberOf=%(group_dn)s)))' % {'group_dn': dn, 'ldap_filter': ldap_filter}
+    #ldap_filter = '(&%(ldap_filter)s(|(isMemberOf=%(group_dn)s)(memberOf=%(group_dn)s)))' % {'group_dn': dn, 'ldap_filter': ldap_filter}
+    # USE MAGIC FILTER (1.2.840.113556.1.4.1941) TO FORCE RECURSION TO GET ALL
+    # MEMBERS OF SUB-GROUPS
+    ldap_filter = '(&%(ldap_filter)s(|(isMemberOf:1.2.840.113556.1.4.1941:=%(group_dn)s)(memberOf:1.2.840.113556.1.4.1941:=%(group_dn)s)))' % {'group_dn': dn, 'ldap_filter': ldap_filter}
+
     attrlist = ['objectClass', 'isMemberOf', 'memberOf', 'givenName', 'sn', 'mail', 'dn', search_attr]
 
     self._search_dn = search_dn
