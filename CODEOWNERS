@@ -1,0 +1,14 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# @global-owner1 and @global-owner2 will be requested for
+# review when someone opens a pull request.
+# See https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+*   @navhealth/engineering
+.circleci/* @navhealth/devops
+serverless.yml @navhealth/devops
+config/* @navhealth/devops
+CODEOWNERS @navhealth/codeowners-owners
+dev.env @navhealth/devops
+tst.env @navhealth/devops
+int.env @navhealth/devops
