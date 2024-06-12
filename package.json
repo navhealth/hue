@@ -21,7 +21,7 @@
   "dependencies": {
     "bootstrap": "3.3.6",
     "commander": "^2.16.0",
-    "dompurify": "0.8.2",
+    "dompurify": "2.0.17",
     "jquery": "2.1.1",
     "knockout": "3.4.0",
     "knockout.mapping": "2.4.3",
