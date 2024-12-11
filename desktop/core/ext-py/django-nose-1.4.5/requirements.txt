@@ -23,7 +23,7 @@ flake8-docstrings==1.1.0
 coverage==4.4.1
 
 # Documentation
-Sphinx==1.6.3
+Sphinx==3.0.4
 
 # Packaging Linters
 check-manifest==0.35
