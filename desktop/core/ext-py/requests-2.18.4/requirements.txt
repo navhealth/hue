@@ -7,7 +7,7 @@ pytest-cov
 pytest-xdist
 alabaster
 readme_renderer
-Sphinx<=1.5.5
+Sphinx<=3.0.4
 PySocks
 setuptools>=18.5
 docutils
