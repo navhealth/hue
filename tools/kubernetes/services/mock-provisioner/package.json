@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "prepare": "npm run snyk-protect",
+    "snyk-protect": "snyk-protect"
   },
   "author": "Cloudera, Inc.",
   "dependencies": {
@@ -18,9 +20,11 @@
     "prom-client": "^11.2.0",
     "request": "^2.88.0",
     "swagger-express-validator": "^0.1.0",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "@snyk/protect": "latest"
   },
   "devDependencies": {
     "prettier": "1.14.3"
-  }
+  },
+  "snyk": true
 }
