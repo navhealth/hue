@@ -22,7 +22,7 @@
     "bootstrap": "3.3.6",
     "commander": "^2.16.0",
     "dompurify": "0.8.2",
-    "jquery": "2.1.1",
+    "jquery": "3.5.0",
     "knockout": "3.4.0",
     "knockout.mapping": "2.4.3",
     "less": "2.6.1",
