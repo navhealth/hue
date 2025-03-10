@@ -9,8 +9,18 @@ alabaster
 readme_renderer
 Sphinx<=1.5.5
 PySocks
-setuptools>=18.5
+setuptools>=70.0.0
 docutils
 flake8
 tox
 detox
+certifi>=2024.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
+eventlet>=0.37.0 # not directly required, pinned by Snyk to avoid a vulnerability
+flask>=2.2.5 # not directly required, pinned by Snyk to avoid a vulnerability
+gevent>=24.10.1 # not directly required, pinned by Snyk to avoid a vulnerability
+idna>=3.7 # not directly required, pinned by Snyk to avoid a vulnerability
+jinja2>=3.1.6 # not directly required, pinned by Snyk to avoid a vulnerability
+pygments>=2.15.0 # not directly required, pinned by Snyk to avoid a vulnerability
+requests>=2.31.0 # not directly required, pinned by Snyk to avoid a vulnerability
+werkzeug>=2.2.3 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
