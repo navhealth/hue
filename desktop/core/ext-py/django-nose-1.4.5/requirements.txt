@@ -37,3 +37,5 @@ gnureadline==6.3.3
 ipython==5.4.1
 ipdb==0.10.3
 ipdbplugin==1.4.5
+urllib3>=2.2.2 # not directly required, pinned by Snyk to avoid a vulnerability
+zipp>=3.19.1 # not directly required, pinned by Snyk to avoid a vulnerability
